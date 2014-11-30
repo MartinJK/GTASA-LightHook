@@ -20,7 +20,7 @@ misrepresented as being the original software.
 \*****************************************************************************/
 
 /* NOTE: 
-	this project is outdates, still works but is writting dirty, needs to be cleaned up!
+	this project is outdated, still working, written in a dirty way, needs to be cleaned up!
 	this executable does not inject itself into GTASA.exe, it modifies it's memory via ReadProcess/WriteProcessMemory!
 	this code is written for SA:MP server who does not allow CLEO/ASI mods (usally they use their "anticheat" clients...)
 */
@@ -40,7 +40,7 @@ char AnsiBuffer[255];
 const char * destPtr = (const char *)AnsiBuffer;
 DWORD dwStatus = 1;
 DWORD dwLight = 1;
-HWND hwnd;
+HWND hwnd = NULL;
 TCHAR szWindowText[100];
 		
 bool EnableDebugPrivilege() 
@@ -49,7 +49,7 @@ bool EnableDebugPrivilege()
     HANDLE hToken; 
     OpenProcessToken(hThis, TOKEN_ADJUST_PRIVILEGES, &hToken); 
     LUID luid; 
-    LookupPrivilegeValue(0, TEXT("seDebugPrivilege"), &luid); 
+    LookupPrivilegeValue(0, TEXT("setDebugPrivilege"), &luid); 
     TOKEN_PRIVILEGES priv; 
     priv.PrivilegeCount = 1; 
     priv.Privileges[0].Luid = luid; 
@@ -82,8 +82,8 @@ void setLightStatus(DWORD _dwLight = NULL, DWORD _dwStatus = NULL)
 		 {
             DWORD currentLightState = 0;
             ReadProcessMemory(hProc,(LPCVOID)(dwVehicle + 1440 + 16), &currentLightState, sizeof(currentLightState), 0);
-            int iResult = (_dwStatus << 2 * _dwLight) | currentLightState & ~(3 << 2 * _dwLight);
-            WriteProcessMemory(hProc,(LPVOID)(dwVehicle + 1440 + 16),&iResult,sizeof(iResult), 0);
+            int _iResult = (_dwStatus << 2 * _dwLight) | currentLightState & ~(3 << 2 * _dwLight);
+            WriteProcessMemory(hProc,(LPVOID)(dwVehicle + 1440 + 16),&_iResult,sizeof(_iResult), 0);
          }
     }
 }
@@ -228,8 +228,7 @@ int main()
 	wOldColAttr = csbiScreen.wAttributes;
 	SetConsoleTextAttribute((HANDLE)GetStdHandle(STD_OUTPUT_HANDLE), wOldColAttr | FOREGROUND_INTENSITY);
 	
-	#define TITLE "[GTA:SA] Lightmod 1.0"
-	SetConsoleTitleA(TITLE);
+	SetConsoleTitleA("[GTA:SA] Lightmod 1.0");
 
 	SetConsoleTextAttribute((HANDLE)GetStdHandle(STD_OUTPUT_HANDLE), 0x006 | FOREGROUND_INTENSITY);
 	printf("Initialisiere GTA:SA, (c) 2012 by Martin Kammersberger(mit Unterstuetzung von Alexander Guettler)\n\n");
